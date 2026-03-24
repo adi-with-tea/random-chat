@@ -8,93 +8,55 @@ const io = new Server(server);
 
 app.use(express.static('public'));
 
-// Use Maps instead of plain objects — more reliable
-const waitingByTag = new Map(); // tag -> socketId
-let waitingAnyId = null;        // socketId of untagged waiter
+const waitingByTag = new Map();
+let waitingAnyId = null;
 
 function matchUsers(socketA, socketB) {
   const room = socketA.id + '#' + socketB.id;
-  socketA.join(room);
-  socketB.join(room);
-  socketA.room = room;
-  socketB.room = room;
-  socketA.emit('matched');
-  socketB.emit('matched');
-  console.log(`Matched: ${socketA.id} <-> ${socketB.id} in room ${room}`);
+  socketA.join(room); socketB.join(room);
+  socketA.room = room; socketB.room = room;
+  socketA.emit('matched', { initiator: true });
+  socketB.emit('matched', { initiator: false });
+  console.log(`Matched: ${socketA.id} <-> ${socketB.id}`);
 }
 
 io.on('connection', (socket) => {
-  console.log('Connected:', socket.id);
-
-  const broadcastCount = () => {
-    io.emit('user_count', io.engine.clientsCount);
-  };
+  const broadcastCount = () => io.emit('user_count', io.engine.clientsCount);
   broadcastCount();
 
   socket.on('find_match', (tag) => {
     const interest = tag ? tag.toLowerCase().trim() : '';
     socket.interest = interest;
-    console.log(`${socket.id} looking for: "${interest}"`);
-
     if (interest) {
       const waitingId = waitingByTag.get(interest);
       if (waitingId && waitingId !== socket.id) {
-        const partnerSocket = io.sockets.sockets.get(waitingId);
-        if (partnerSocket && partnerSocket.connected) {
-          waitingByTag.delete(interest);
-          matchUsers(socket, partnerSocket);
-          return;
-        } else {
-          // Stale entry — clean it up
-          waitingByTag.delete(interest);
-        }
+        const partner = io.sockets.sockets.get(waitingId);
+        if (partner && partner.connected) { waitingByTag.delete(interest); matchUsers(socket, partner); return; }
+        else waitingByTag.delete(interest);
       }
-      // No valid match found — wait
       waitingByTag.set(interest, socket.id);
-      socket.emit('waiting', `Looking for someone interested in "${interest}"...`);
+      socket.emit('waiting', `Looking for someone into "${interest}"...`);
     } else {
       if (waitingAnyId && waitingAnyId !== socket.id) {
-        const partnerSocket = io.sockets.sockets.get(waitingAnyId);
-        if (partnerSocket && partnerSocket.connected) {
-          waitingAnyId = null;
-          matchUsers(socket, partnerSocket);
-          return;
-        } else {
-          waitingAnyId = null;
-        }
+        const partner = io.sockets.sockets.get(waitingAnyId);
+        if (partner && partner.connected) { waitingAnyId = null; matchUsers(socket, partner); return; }
+        else waitingAnyId = null;
       }
       waitingAnyId = socket.id;
       socket.emit('waiting', 'Looking for a stranger...');
     }
   });
 
-  socket.on('message', (msg) => {
-    if (socket.room) {
-      socket.to(socket.room).emit('message', msg);
-    }
-  });
-
-  socket.on('typing', (isTyping) => {
-    if (socket.room) {
-      socket.to(socket.room).emit('typing', isTyping);
-    }
-  });
-
-  socket.on('delete_message', (msgId) => {
-    if (socket.room) {
-      socket.to(socket.room).emit('delete_message', msgId);
-    }
-  });
+  socket.on('key_exchange', (data) => { if (socket.room) socket.to(socket.room).emit('key_exchange', data); });
+  socket.on('message', (data) => { if (socket.room) socket.to(socket.room).emit('message', data); });
+  socket.on('delete_message', (data) => { if (socket.room) socket.to(socket.room).emit('delete_message', data); });
+  socket.on('typing', (v) => { if (socket.room) socket.to(socket.room).emit('typing', v); });
+  socket.on('read_receipt', (data) => { if (socket.room) socket.to(socket.room).emit('read_receipt', data); });
 
   socket.on('disconnect', () => {
-    console.log('Disconnected:', socket.id);
     if (waitingAnyId === socket.id) waitingAnyId = null;
-    if (socket.interest && waitingByTag.get(socket.interest) === socket.id) {
-      waitingByTag.delete(socket.interest);
-    }
-    if (socket.room) {
-      socket.to(socket.room).emit('partner_left');
-    }
+    if (socket.interest && waitingByTag.get(socket.interest) === socket.id) waitingByTag.delete(socket.interest);
+    if (socket.room) socket.to(socket.room).emit('partner_left');
     broadcastCount();
   });
 });
