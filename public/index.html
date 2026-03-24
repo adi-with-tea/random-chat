@@ -1,306 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Random Chat 🚀</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-gradient: linear-gradient(135deg, #FF6B6B 0%, #556270 100%);
-      --glass-bg: rgba(255, 255, 255, 0.08);
-      --glass-border: rgba(255, 255, 255, 0.15);
-      --primary: #FF3366;
-      --secondary: #4ECDC4;
-      --text-main: #FFFFFF;
-      --text-muted: rgba(255, 255, 255, 0.7);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexChat - Secure Anonymous Chat</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Outfit', sans-serif;
-    }
-
-    body {
-      background: #0f0c29;
-      background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
-      color: var(--text-main);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* 3D Floating Orbs for Background */
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      z-index: -1;
-      animation: float 10s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .orb-1 {
-      width: 300px; height: 300px;
-      background: var(--primary);
-      top: 10%; left: 15%;
-    }
-    .orb-2 {
-      width: 400px; height: 400px;
-      background: var(--secondary);
-      bottom: 5%; right: 10%;
-      animation-delay: -5s;
-    }
-    .orb-3 {
-      width: 250px; height: 250px;
-      background: #8A2BE2;
-      top: 40%; left: 50%;
-      animation-delay: -2s;
-    }
-
-    @keyframes float {
-      0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(50px, 80px) scale(1.15); }
-    }
-
-    /* Main Chat Container - 3D Glassmorphism */
-    .chat-container {
-      width: 90%;
-      max-width: 450px;
-      height: 85vh;
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      border-radius: 30px;
-      box-shadow: 
-        0 25px 50px rgba(0,0,0,0.5),
-        inset 0 1px 0 rgba(255,255,255,0.3),
-        inset 0 -2px 5px rgba(0,0,0,0.3);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      transform: perspective(1000px) rotateX(2deg) rotateY(-1deg);
-      transition: transform 0.4s ease, box-shadow 0.4s ease;
-    }
-    .chat-container:hover {
-      transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(-8px);
-      box-shadow: 
-        0 35px 60px rgba(0,0,0,0.6),
-        inset 0 1px 0 rgba(255,255,255,0.3),
-        inset 0 -2px 5px rgba(0,0,0,0.3);
-    }
-
-    /* Header */
-    .header {
-      padding: 22px;
-      text-align: center;
-      border-bottom: 1px solid var(--glass-border);
-      background: rgba(0,0,0,0.15);
-      position: relative;
-    }
-    .header h1 {
-      font-size: 1.6rem;
-      font-weight: 800;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      background: linear-gradient(to right, #FF3366, #f9a826);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0px 4px 10px rgba(255, 51, 102, 0.3);
-    }
-
-    /* Chat Area */
-    .chat-box {
-      flex: 1;
-      padding: 24px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      scroll-behavior: smooth;
-    }
-    /* Scrollbar */
-    .chat-box::-webkit-scrollbar { width: 6px; }
-    .chat-box::-webkit-scrollbar-track { background: transparent; }
-    .chat-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-    .chat-box::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
-
-    /* Messages */
-    .message {
-      padding: 14px 20px;
-      border-radius: 22px;
-      max-width: 82%;
-      font-size: 0.95rem;
-      line-height: 1.5;
-      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-      position: relative;
-      word-wrap: break-word;
-    }
-    @keyframes popIn {
-      0% { opacity: 0; transform: scale(0.8) translateY(15px) rotateX(20deg); }
-      100% { opacity: 1; transform: scale(1) translateY(0) rotateX(0deg); }
-    }
-
-    .message.system {
-      align-self: center;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      border-radius: 30px;
-      padding: 8px 16px;
-    }
-    .message.you {
-      align-self: flex-end;
-      background: linear-gradient(135deg, #FF3366, #ff6b6b);
-      color: white;
-      border-bottom-right-radius: 6px;
-      box-shadow: 0 8px 20px rgba(255, 51, 102, 0.35), inset 0 2px 4px rgba(255,255,255,0.25);
-      border: 1px solid rgba(255, 107, 139, 0.5);
-    }
-    .message.stranger {
-      align-self: flex-start;
-      background: linear-gradient(135deg, #1f4037, #99f2c8);
-      color: #0b211a;
-      font-weight: 600;
-      border-bottom-left-radius: 6px;
-      box-shadow: 0 8px 20px rgba(153, 242, 200, 0.25), inset 0 2px 4px rgba(255,255,255,0.4);
-      border: 1px solid rgba(153, 242, 200, 0.5);
-    }
-
-    /* Input Area */
-    .input-area {
-      padding: 18px 22px;
-      display: flex;
-      gap: 12px;
-      background: rgba(0,0,0,0.25);
-      border-top: 1px solid var(--glass-border);
-      align-items: center;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      padding: 16px 22px;
-      border-radius: 28px;
-      border: 1px solid var(--glass-border);
-      background: rgba(255,255,255,0.07);
-      color: white;
-      font-size: 1rem;
-      outline: none;
-      transition: all 0.3s ease;
-      box-shadow: inset 0 3px 6px rgba(0,0,0,0.3);
-    }
-    input[type="text"]:focus {
-      background: rgba(255,255,255,0.12);
-      border-color: rgba(255,255,255,0.5);
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.15), inset 0 3px 6px rgba(0,0,0,0.3);
-    }
-    input[type="text"]::placeholder {
-      color: rgba(255,255,255,0.4);
-      font-weight: 400;
-    }
-
-    button {
-      padding: 16px 26px;
-      border-radius: 28px;
-      border: none;
-      background: linear-gradient(135deg, #FF3366, #ff9933);
-      color: white;
-      font-weight: 800;
-      font-size: 1rem;
-      cursor: pointer;
-      box-shadow: 0 6px 15px rgba(255, 51, 102, 0.3), inset 0 2px 3px rgba(255,255,255,0.3);
-      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    button:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 10px 25px rgba(255, 51, 102, 0.4), inset 0 2px 3px rgba(255,255,255,0.3);
-    }
-    button:active {
-      transform: translateY(1px) scale(0.98);
-      box-shadow: 0 3px 10px rgba(255, 51, 102, 0.3);
-    }
-
-  </style>
+    <!-- ES Module Shims for Import Maps compatibility -->
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.150.1/build/three.module.js"
+        }
+      }
+    </script>
 </head>
 <body>
-
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-
-  <div class="chat-container">
-    <div class="header">
-      <h1>Random Chat 🚀</h1>
-    </div>
+    <canvas id="bg-canvas"></canvas>
     
-    <div class="chat-box" id="chat">
-      <!-- System messages and user messages go here -->
+    <div class="glass-container" id="app-container">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <h1 class="logo">Nex<span>Chat</span></h1>
+            <p class="subtitle">Next-Gen E2E Encrypted Anonymous Chat</p>
+            <div class="user-count" id="online-count">Live Users Online: 0</div>
+            
+            <div class="interests-box">
+                <!-- Connect with someone who has the same interest tag -->
+                <input type="text" id="interest-input" placeholder="Add an interest (optional)">
+            </div>
+            
+            <button id="start-btn" class="glow-btn">Start Chat</button>
+        </div>
+
+        <!-- Chat Screen -->
+        <div id="chat-screen" class="screen">
+            <div class="chat-header">
+                <div class="status-indicator">
+                    <span class="dot"></span>
+                    <span id="chat-status">Searching...</span>
+                    <!-- Secured Badge for E2EE context -->
+                    <span id="encryption-badge" class="badge hidden">🔒 Encrypted</span>
+                </div>
+                <button id="next-btn" class="outline-btn">Next</button>
+            </div>
+            
+            <div class="chat-messages" id="chat-box"></div>
+            
+            <div class="typing-indicator hidden" id="typing-indicator">Stranger is typing<span>.</span><span>.</span><span>.</span></div>
+            
+            <div class="chat-input-area">
+                <input type="text" id="msg-input" placeholder="Type your vibe..." disabled>
+                <button id="send-btn" disabled>Send</button>
+            </div>
+        </div>
     </div>
 
-    <div class="input-area">
-      <input type="text" id="msg" placeholder="Type your vibe..." onkeypress="handleKeyPress(event)" autocomplete="off" />
-      <button onclick="sendMsg()">Send</button>
-    </div>
-  </div>
-
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io();
-    const chat = document.getElementById("chat");
-    const msgInput = document.getElementById("msg");
-
-    function scrollToBottom() {
-      chat.scrollTop = chat.scrollHeight;
-    }
-
-    function appendMessage(text, type) {
-      const msgDiv = document.createElement("div");
-      msgDiv.className = `message ${type}`;
-      msgDiv.textContent = text;
-      chat.appendChild(msgDiv);
-      scrollToBottom();
-    }
-
-    socket.on("connect", () => {
-      console.log("Connected");
-      socket.emit("find_match", "");
-      appendMessage("Searching for a stranger...", "system");
-    });
-
-    socket.on("matched", () => {
-      appendMessage("Matched! Say hi 👋", "system");
-    });
-
-    socket.on("message", (msg) => {
-      appendMessage(msg, "stranger");
-    });
-
-    function sendMsg() {
-      const msg = msgInput.value.trim();
-      if (!msg) return;
-
-      appendMessage(msg, "you");
-      socket.emit("message", msg);
-      
-      msgInput.value = "";
-      msgInput.focus();
-    }
-
-    function handleKeyPress(e) {
-      if (e.key === "Enter") {
-        sendMsg();
-      }
-    }
-  </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="/js/app.js"></script>
 </body>
 </html>

@@ -88,8 +88,11 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('message', (data) => {
-    if (socket.room) socket.to(socket.room).emit('message', data);
+  const forwardEvents = ['message', 'public_key', 'typing', 'stop_typing', 'delete_message', 'message_read'];
+  forwardEvents.forEach(evt => {
+    socket.on(evt, (data) => {
+      if (socket.room) socket.to(socket.room).emit(evt, data);
+    });
   });
 
   socket.on('disconnect', () => {
