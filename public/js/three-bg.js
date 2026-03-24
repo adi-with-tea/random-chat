@@ -80,6 +80,12 @@ export function pulseBackground() {
   pulseFactor = 1.0;
 }
 
+export function explodeBackground() {
+  pulseFactor = 4.0;
+  particles.rotation.z += 0.5;
+  particles.rotation.x += 0.2;
+}
+
 function onDocumentMouseMove(event) {
     mouseX = (event.clientX - windowHalfX) * 0.5;
     mouseY = (event.clientY - windowHalfY) * 0.5;
