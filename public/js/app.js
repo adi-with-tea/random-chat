@@ -164,9 +164,9 @@ UI.fileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if(!file || currentState !== 'MATCHED') return;
     
-    // Validate file size limit (5MB over websocket to be safe)
-    if(file.size > 5 * 1024 * 1024) {
-        alert("File is too large! Limit is 5MB.");
+    // Validate file size limit (100MB limit)
+    if(file.size > 100 * 1024 * 1024) {
+        alert("File is too large! Limit is 100MB.");
         UI.fileInput.value = '';
         return;
     }

@@ -42,12 +42,14 @@ canvas#bg-canvas {
   -webkit-backdrop-filter: blur(24px);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .screen {
   display: none;
   flex: 1;
   flex-direction: column;
+  min-height: 0;
 }
 .screen.active {
   display: flex;
@@ -195,6 +197,7 @@ canvas#bg-canvas {
   flex-direction: column;
   gap: 16px;
   scroll-behavior: smooth;
+  min-height: 0;
 }
 /* Scrollbar */
 .chat-messages::-webkit-scrollbar { width: 8px; }
