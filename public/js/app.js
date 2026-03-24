@@ -60,6 +60,10 @@ socket.on('user_count', count => {
 });
 
 UI.startBtn.addEventListener('click', () => {
+    if(!UI.interestInput.value) {
+        alert("Please select a vibe first to match with someone!");
+        return;
+    }
     switchScreen('chat');
     startSearch();
 });
